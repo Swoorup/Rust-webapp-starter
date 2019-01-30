@@ -2,20 +2,20 @@ use diesel::{self,sql_query,RunQueryDsl,QueryDsl,ExpressionMethods};
 use actix_web::{actix::Handler, error,Error};
 use chrono::Utc;
 use bcrypt::{DEFAULT_COST, hash, verify};
-use jwt::{encode, Header, Algorithm};
+use crate::jwt::{encode, Header, Algorithm};
 
-use model::user::{User, NewUser, SignupUser, SigninUser, UserInfo, UserUpdate, UserDelete};
-use model::response::{Msgs, SigninMsgs, UserInfoMsgs};
-use model::db::ConnDsl;
-use share::common::Claims;
-use model::response::MyError;
+use crate::model::user::{User, NewUser, SignupUser, SigninUser, UserInfo, UserUpdate, UserDelete};
+use crate::model::response::{Msgs, SigninMsgs, UserInfoMsgs};
+use crate::model::db::ConnDsl;
+use crate::share::common::Claims;
+use crate::model::response::MyError;
 
 impl Handler<SignupUser> for ConnDsl {
     type Result = Result<Msgs, Error>;
 
     fn handle(&mut self, signup_user: SignupUser, _: &mut Self::Context) -> Self::Result {
         if &signup_user.password == &signup_user.confirm_password {
-                use share::schema::users::dsl::*;
+                use crate::share::schema::users::dsl::*;
                 let hash_password = match hash(&signup_user.password, DEFAULT_COST) {
                     Ok(h) => h,
                     Err(_) => panic!()
@@ -45,14 +45,14 @@ impl Handler<SigninUser> for ConnDsl {
     type Result = Result<SigninMsgs, Error>;
 
     fn handle(&mut self, signin_user: SigninUser, _: &mut Self::Context) -> Self::Result {
-        use share::schema::users::dsl::*;
+        use crate::share::schema::users::dsl::*;
         let conn = &self.0.get().map_err(error::ErrorInternalServerError)?;
         let login_user =  users.filter(&username.eq(&signin_user.username)).load::<User>(conn).map_err(error::ErrorInternalServerError)?.pop();
         let no_user = User::new();
         match login_user {
             Some(login_user) => {
                 match verify(&signin_user.password, &login_user.password) {
-                    Ok(valid) => {
+                    Ok(_) => {
                         let key = "secret";
                         let claims = Claims {
                             user_id: login_user.id.to_string(),
@@ -101,7 +101,7 @@ impl Handler<UserInfo> for ConnDsl {
     type Result = Result<UserInfoMsgs, Error>;
 
     fn handle(&mut self, user_info: UserInfo, _: &mut Self::Context) -> Self::Result {
-        use share::schema::users::dsl::*;
+        use crate::share::schema::users::dsl::*;
         let user_id: i32 = user_info.user_id.parse().map_err(error::ErrorBadRequest)?;
         let conn = &self.0.get().map_err(error::ErrorInternalServerError)?;
         let login_user =  users.filter(&id.eq(&user_id)).load::<User>(conn).map_err(error::ErrorInternalServerError)?.pop();
@@ -136,17 +136,16 @@ impl Handler<UserDelete> for ConnDsl {
     type Result = Result<Msgs, MyError>;
 
     fn handle(&mut self, user_delete: UserDelete, _: &mut Self::Context) -> Self::Result {
-        use share::schema::users::dsl::*;
+        use crate::share::schema::users::dsl::*;
         println!("============{:?}============", user_delete.user_id);
         let user_id: i32 = user_delete.user_id.parse().unwrap();
         let conn = &self.0.get().unwrap();
         let login_user = diesel::delete(users.filter(&id.eq(&user_id))).execute(conn);
         match login_user {
-            Ok(Msgs) => Ok(Msgs{
+            Ok(_) => Ok(Msgs{
                                 status: 200,
                                 message : "delete  loginuser success.".to_string(),
                         }),
-            Ok(_) => Err(MyError::NotFound),
             Err(_) => Err(MyError::DatabaseError),
         }
     }
@@ -156,7 +155,7 @@ impl Handler<UserUpdate> for ConnDsl {
     type Result = Result<Msgs, Error>;
 
     fn handle(&mut self, user_update: UserUpdate, _: &mut Self::Context) -> Self::Result {
-        use share::schema::users::dsl::*;
+        use crate::share::schema::users::dsl::*;
         let conn = &self.0.get().map_err(error::ErrorInternalServerError)?;
         let hash_password = match hash(&user_update.newpassword, DEFAULT_COST) {
                     Ok(h) => h,
