@@ -1,11 +1,11 @@
 use actix_web::{App,fs, http::{header, Method},middleware::{self,cors::Cors}};
 
-use model::db::init;
-use share::state::AppState;
+use crate::model::db::init;
+use crate::share::state::AppState;
 
-use api::{home::{index,path},auth::{signup, signin}};
-use api::article::{article,article_list, article_new};
-use api::user::{user_info, user_delete, user_update};
+use crate::api::{home::{index,path},auth::{signup, signin}};
+use crate::api::article::{article,article_list, article_new};
+use crate::api::user::{user_info, user_delete, user_update};
 
 pub fn app_state() -> App<AppState> {
      let addr = init();

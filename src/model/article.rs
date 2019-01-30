@@ -1,7 +1,7 @@
 use actix_web::{Error,actix::Message};
-use share::schema::article;
+use crate::share::schema::article;
 use chrono::{Utc, NaiveDateTime};
-use model::response::{ArticleListMsgs, ArticleMsgs, Msgs};
+use crate::model::response::{ArticleListMsgs, ArticleMsgs, Msgs};
 
 #[derive(Clone,Debug,Serialize,Deserialize,PartialEq,Queryable)]
 pub struct Article {

@@ -1,8 +1,8 @@
 use actix_web::{Error,actix::Message};
-use share::schema::users;
+use crate::share::schema::users;
 use chrono::{Utc, NaiveDateTime};
-use model::response::{Msgs, SigninMsgs, UserInfoMsgs};
-use model::response::MyError;
+use crate::model::response::{Msgs, SigninMsgs, UserInfoMsgs};
+use crate::model::response::MyError;
 
 #[derive(Debug,Serialize,Deserialize,PartialEq,Identifiable,Queryable)]
 pub struct User {
