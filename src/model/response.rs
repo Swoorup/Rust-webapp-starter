@@ -1,5 +1,5 @@
-use model::user::User;
-use model::article::Article;
+use crate::model::user::User;
+use crate::model::article::Article;
 
 pub enum MyError {
     NotFound,

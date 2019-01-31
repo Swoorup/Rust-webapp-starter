@@ -1,4 +1,4 @@
-#![allow(warnings)]
+#![allow(unused_imports, dead_code, non_snake_case)]
 
 #[macro_use] extern crate diesel;
 #[macro_use] extern crate serde_derive;
