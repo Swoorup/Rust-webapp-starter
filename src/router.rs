@@ -3,7 +3,7 @@ use actix_web::{App,fs, http::{header, Method}, middleware::{self,cors::Cors}, a
 use crate::model::db::ConnDsl;
 use crate::share::state::AppState;
 
-use crate::api::{home::{index,path},auth::{signup, signin}};
+use crate::api::{home::index,auth::{signup, signin}};
 use crate::api::article::{article,article_list, article_new};
 use crate::api::user::{user_info, user_delete, user_update};
 
@@ -31,6 +31,6 @@ pub fn app() -> App {
     App::new()
         .middleware(middleware::Logger::default())
         .resource("/", |r| r.f(index))
-        .resource("/a/{tail:.*}", |r| r.f(path))
+        .resource("/a/{tail:.*}", |r| r.f(index))
         .handler("/", fs::StaticFiles::new("public").unwrap())
 }
