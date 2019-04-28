@@ -17,6 +17,8 @@ extern crate jsonwebtoken as jwt;
 
 use actix_web::{actix::System,server};
 
+use crate::model::db::init;
+
 mod api;
 mod handler;
 mod model;
@@ -28,10 +30,11 @@ fn main() {
     ::std::env::set_var("RUST_BACKTRACE", "1");
     env_logger::init();
     let sys = System::new("wapp");
+    let addr = init();
 
     server::new( move || 
         vec![
-            router::app_state().boxed(),
+            router::app_state(addr.clone()).boxed(),
             router::app().boxed(),
         ])
         .bind("localhost:8000").unwrap()

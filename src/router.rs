@@ -1,14 +1,13 @@
-use actix_web::{App,fs, http::{header, Method},middleware::{self,cors::Cors}};
+use actix_web::{App,fs, http::{header, Method}, middleware::{self,cors::Cors}, actix::Addr};
 
-use crate::model::db::init;
+use crate::model::db::ConnDsl;
 use crate::share::state::AppState;
 
-use crate::api::{home::{index,path},auth::{signup, signin}};
+use crate::api::{home::index,auth::{signup, signin}};
 use crate::api::article::{article,article_list, article_new};
 use crate::api::user::{user_info, user_delete, user_update};
 
-pub fn app_state() -> App<AppState> {
-     let addr = init();
+pub fn app_state(addr: Addr<ConnDsl>) -> App<AppState> {
      App::with_state(AppState{ db: addr.clone()})
          .middleware(middleware::Logger::default())
          .prefix("/api")
@@ -32,6 +31,6 @@ pub fn app() -> App {
     App::new()
         .middleware(middleware::Logger::default())
         .resource("/", |r| r.f(index))
-        .resource("/a/{tail:.*}", |r| r.f(path))
+        .resource("/a/{tail:.*}", |r| r.f(index))
         .handler("/", fs::StaticFiles::new("public").unwrap())
 }
